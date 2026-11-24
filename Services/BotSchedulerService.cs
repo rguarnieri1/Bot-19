@@ -1,4 +1,4 @@
-using BotCripto.Models;
+﻿using BotCripto.Models;
 using BotCripto.Strategies;
 
 namespace BotCripto.Services;
@@ -12,7 +12,7 @@ public class BotSchedulerService
     private readonly YahooDataService _dataService;
     private readonly NotificationService _notificationService;
     private readonly ReportingService _reportingService;
-    private readonly EmaRibbonTrendFollowingStrategy _emaRibbonStrategy;
+    private readonly SwingTradingLongStrategy _strategy;
     private readonly RiskManager _riskManager;
     private Timer? _marketCheckTimer;
     private Timer? _weeklyReportTimer;
@@ -39,7 +39,7 @@ public class BotSchedulerService
         _dataService = new YahooDataService();
         _notificationService = new NotificationService();
         _reportingService = new ReportingService();
-        _emaRibbonStrategy = new EmaRibbonTrendFollowingStrategy();
+        _strategy = new SwingTradingLongStrategy();
         _riskManager = new RiskManager(
             positionValue: capitalPerTrade,   // importo fisso per trade (€)
             rewardRiskRatio: rewardRiskRatio, // take profit = R:R × distanza dello stop
@@ -170,9 +170,9 @@ public class BotSchedulerService
             else
             {
                 // Regime di mercato (FTSE MIB sopra/sotto la EMA50) sulla seduta appena chiusa: filtro direzionale della strategia
-                var marketBullish = EmaRibbonTrendFollowingStrategy.IsMarketBullish(marketClosed);
+                var marketBullish = SwingTradingLongStrategy.IsMarketBullish(marketClosed);
                 Console.WriteLine($"🕯️  Seduta del {lastClosedTime:yyyy-MM-dd} chiusa: ricerca segnali");
-                Console.WriteLine($"📊 Regime di mercato ({YahooDataService.MarketSymbol}): {(marketBullish == null ? "sconosciuto (nessun segnale)" : marketBullish.Value ? "rialzista (solo long)" : "ribassista (solo short)")}");
+                Console.WriteLine($"📊 Regime di mercato ({YahooDataService.MarketSymbol}): {(marketBullish == null ? "sconosciuto (nessun segnale)" : marketBullish.Value ? "rialzista" : "ribassista")}{(BotCripto.Strategies.SwingTradingLongStrategy.UseMarketRegimeFilter ? (marketBullish == true ? " (solo long)" : marketBullish == false ? " (solo short)" : "") : " - filtro regime disattivato: long e short")}");
                 cycle.BtcRegime = marketBullish == null ? "Sconosciuto" : marketBullish.Value ? "Rialzista" : "Ribassista";
 
                 _lastScannedCandle = lastClosedTime;
@@ -215,13 +215,13 @@ public class BotSchedulerService
                             continue;
                         }
 
-                        // ✅ STRATEGIA PRINCIPALE: EMA Ribbon Trend Following + Candle Confirmation
-                        var emaRibbonResult = _emaRibbonStrategy.Analyze(symbol, candles, marketBullish);
+                        // ✅ STRATEGIA PRINCIPALE: Swing Trading
+                        var signalResult = _strategy.Analyze(symbol, candles, marketBullish);
 
-                        if (emaRibbonResult.IsSignal)
-                            candidates.Add((symbol, emaRibbonResult, candles));
+                        if (signalResult.IsSignal)
+                            candidates.Add((symbol, signalResult, candles));
                         else
-                            CountRejection(RejectionLabel(emaRibbonResult.Rejection));
+                            CountRejection(RejectionLabel(signalResult.Rejection));
 
                     }
                     catch (Exception ex)
@@ -234,9 +234,9 @@ public class BotSchedulerService
                 await IsinService.PrefetchAsync(candidates.Select(c => c.symbol));
 
                 // Dal segnale più forte al più debole (capitale illimitato: entrano tutti i segnali validi)
-                foreach (var (symbol, emaRibbonResult, candles) in candidates.OrderByDescending(c => c.analysis.Indicators.GetValueOrDefault("SignalStrength")))
+                foreach (var (symbol, signalResult, candles) in candidates.OrderByDescending(c => c.analysis.Indicators.GetValueOrDefault("SignalStrength")))
                 {
-                    var isLong = emaRibbonResult.Signal.Contains("BUY");
+                    var isLong = signalResult.Signal.Contains("BUY");
                     // Ingresso alla chiusura della candela del segnale (come nel backtest), non al prezzo live:
                     // lo stop della strategia è calcolato su quella candela e i controlli stop/target partono dalla successiva.
                     var entryPrice = candles.Last().Close;
@@ -245,10 +245,10 @@ public class BotSchedulerService
                         entryPrice,
                         CalculateVolatility(candles),
                         isLong,
-                        emaRibbonResult.Indicators.GetValueOrDefault("StopLoss")
+                        signalResult.Indicators.GetValueOrDefault("StopLoss")
                     );
 
-                    var signalRecord = SignalRecord.FromAnalysis(emaRibbonResult, _timeframe, lastClosedTime!.Value, entryPrice, isLong);
+                    var signalRecord = SignalRecord.FromAnalysis(signalResult, _timeframe, lastClosedTime!.Value, entryPrice, isLong);
 
                     if (!positionResult.IsValid)
                     {
@@ -260,17 +260,17 @@ public class BotSchedulerService
                         continue;
                     }
 
-                    emaRibbonResult.Indicators["StopLoss"] = positionResult.StopLossPrice;
-                    emaRibbonResult.Indicators["Target"] = positionResult.TargetPrice;
-                    emaRibbonResult.Indicators["PositionSize"] = positionResult.PositionSize;
-                    emaRibbonResult.Indicators["RiskRewardRatio"] = positionResult.RiskRewardRatio;
-                    emaRibbonResult.Indicators["ExpectedProfit"] = positionResult.ExpectedProfit;
+                    signalResult.Indicators["StopLoss"] = positionResult.StopLossPrice;
+                    signalResult.Indicators["Target"] = positionResult.TargetPrice;
+                    signalResult.Indicators["PositionSize"] = positionResult.PositionSize;
+                    signalResult.Indicators["RiskRewardRatio"] = positionResult.RiskRewardRatio;
+                    signalResult.Indicators["ExpectedProfit"] = positionResult.ExpectedProfit;
 
-                    await _notificationService.SendNotificationAsync(emaRibbonResult);
+                    await _notificationService.SendNotificationAsync(signalResult);
                     var trade = _reportingService.RecordTrade(
                         symbol,
                         entryPrice,
-                        "EMA Ribbon Trend Following (Primary)",
+                        "Swing Trading Long (Primary)",
                         isLong,
                         positionResult.StopLossPrice,
                         positionResult.TargetPrice,

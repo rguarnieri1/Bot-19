@@ -1,4 +1,4 @@
-using BotCripto.Data;
+﻿using BotCripto.Data;
 using BotCripto.Services;
 using Newtonsoft.Json.Linq;
 
@@ -23,7 +23,7 @@ Console.CancelKeyPress += (_, _) =>
 
 Console.WriteLine(@"
 ╔════════════════════════════════════════════════════════╗
-║       🤖 Bot 17 - ERTF - AZIONI ITA (Yahoo Finance)    ║
+║  🤖 Bot 19 - Swing trading long+short (Yahoo Finance)  ║
 ║                 Backtest + Live Trading                ║
 ╚════════════════════════════════════════════════════════╝
 ");
@@ -39,6 +39,14 @@ var tradingSettings = appSettings["TradingSettings"] ?? throw new InvalidOperati
 var marketSettings = appSettings["MarketMonitoring"] ?? throw new InvalidOperationException("appsettings.json: sezione MarketMonitoring mancante");
 decimal CapitalPerTrade = tradingSettings.Value<decimal?>("CapitalPerTrade") ?? throw new InvalidOperationException("appsettings.json: CapitalPerTrade mancante");
 decimal RewardRiskRatio =tradingSettings.Value<decimal?>("RewardRiskRatio") ?? throw new InvalidOperationException("appsettings.json: RewardRiskRatio mancante");
+BotCripto.Strategies.SwingTradingLongStrategy.AllowLongs = tradingSettings.Value<bool?>("AllowLong") ?? true;
+BotCripto.Strategies.SwingTradingLongStrategy.AllowShorts = tradingSettings.Value<bool?>("AllowShort") ?? true;
+BotCripto.Strategies.SwingTradingLongStrategy.UseMarketRegimeFilter = tradingSettings.Value<bool?>("UseMarketRegimeFilter") ?? false;
+Console.WriteLine($"⚙️  Direzioni: long={(BotCripto.Strategies.SwingTradingLongStrategy.AllowLongs ? "ON" : "OFF")}, short={(BotCripto.Strategies.SwingTradingLongStrategy.AllowShorts ? "ON" : "OFF")}, filtro regime={(BotCripto.Strategies.SwingTradingLongStrategy.UseMarketRegimeFilter ? "ON" : "OFF")}");
+BotCripto.Strategies.SwingTradingLongStrategy.AtrStopBuffer = tradingSettings.Value<decimal?>("AtrStopBuffer") ?? 12m;
+BotCripto.Strategies.SwingTradingLongStrategy.MinStopPercent = tradingSettings.Value<decimal?>("MinStopPercent") ?? 0.30m;
+BotCripto.Strategies.SwingTradingLongStrategy.MaxStopPercent = tradingSettings.Value<decimal?>("MaxStopPercent") ?? 0.70m;
+Console.WriteLine($"⚙️  Stop: buffer {BotCripto.Strategies.SwingTradingLongStrategy.AtrStopBuffer} ATR, ampiezza {BotCripto.Strategies.SwingTradingLongStrategy.MinStopPercent:P0}-{BotCripto.Strategies.SwingTradingLongStrategy.MaxStopPercent:P0}");
 string Timeframe = marketSettings.Value<string>("TimeframeForCandlesticks") ?? throw new InvalidOperationException("appsettings.json: TimeframeForCandlesticks mancante");
 
 // I dati Yahoo Finance (YFSharp) usati dal bot sono solo candele giornaliere
@@ -108,7 +116,7 @@ async Task RunLiveAsync()
     var scheduler = new BotSchedulerService(Timeframe, RewardRiskRatio, CapitalPerTrade);
 
     Console.WriteLine("Strategia Principale Attiva:");
-    Console.WriteLine("  ⭐ EMA Ribbon Trend Following + Candle Confirmation");
+    Console.WriteLine("  ⭐ Swing Trading (EMA20/50/200 + pullback RSI + ripartenza)");
     Console.WriteLine($"     • Configurazione: EMA 5, 10, 20, 30 su candele {Timeframe}");
     Console.WriteLine("     • Filtri: Volume, Candle Body, RSI, Breakout Confirmation, Regime di mercato (FTSE MIB vs EMA50)");
     Console.WriteLine("     • Modalità: paper trading (segnali e trade simulati, nessun ordine reale)");

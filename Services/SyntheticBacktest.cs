@@ -1,4 +1,4 @@
-using BotCripto.Models;
+﻿using BotCripto.Models;
 
 namespace BotCripto.Services;
 
@@ -125,7 +125,7 @@ public class SyntheticBacktest
                     CloseTime = closeTime,
                     EntryPrice = entryPrice,
                     ExitPrice = exitPrice,
-                    Strategy = "EMA Ribbon Trend Following (Primary)",
+                    Strategy = "Swing Trading Long (Primary)",
                     Status = "Closed",
                     Profit = exitPrice - entryPrice,
                     ProfitPercentage = ((exitPrice - entryPrice) / entryPrice) * 100
@@ -176,7 +176,7 @@ public class SyntheticBacktest
         Console.WriteLine($"\n📊 STRATEGY DISTRIBUTION:");
         var emaCount = result.Trades.Count(t => t.Strategy.Contains("EMA"));
         if (result.Trades.Count > 0)
-            Console.WriteLine($"   • EMA Ribbon Trend Following: {emaCount} ({(decimal)emaCount / result.Trades.Count * 100:F1}%)");
+            Console.WriteLine($"   • Swing Trading: {emaCount} ({(decimal)emaCount / result.Trades.Count * 100:F1}%)");
 
         Console.WriteLine($"\n📈 ANNUALIZED METRICS:");
         var annualizedROI = result.Metrics.ROI * (365m / result.DaysOfData);
