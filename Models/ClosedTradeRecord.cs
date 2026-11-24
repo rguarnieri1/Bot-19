@@ -1,11 +1,11 @@
 namespace BotCripto.Models;
 
 // Operazione chiusa, con gli stessi dati del blocco "OPERAZIONE CHIUSA" che veniva scritto in
-// Logs/Operazioni_chiuse.log. Salvata nella tabella bot17.bot17_operazioni_chiuse.
+// Logs/Operazioni_chiuse.log. Salvata nella tabella bot19.bot19_operazioni_chiuse.
 public class ClosedTradeRecord
 {
     public long Id { get; set; }
-    public string TradeId { get; set; } = "";   // bot17.bot17_trades.Id
+    public string TradeId { get; set; } = "";   // bot19.bot19_trades.Id
     public string? Symbol { get; set; }
     public string? Isin { get; set; }          // codice ISIN (EODHD)
     public string? Strategy { get; set; }

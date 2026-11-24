@@ -1,4 +1,4 @@
--- Tabella bot17.bot17_signals del Bot 17: un record per ogni segnale valido della strategia EMA Ribbon
+-- Tabella bot19.bot19_signals del Bot 19: un record per ogni segnale valido della strategia EMA Ribbon
 -- calcolato sulle candele scaricate da Yahoo Finance (AnalysisResult con IsSignal = true),
 -- con gli indicatori della strategia e l'esito del Risk Manager. Non fa nulla se la tabella esiste già.
 IF DB_ID(N'bot') IS NULL
@@ -6,12 +6,12 @@ IF DB_ID(N'bot') IS NULL
 GO
 USE [bot];
 GO
-IF SCHEMA_ID(N'bot17') IS NULL
-    EXEC(N'CREATE SCHEMA [bot17]');
+IF SCHEMA_ID(N'bot19') IS NULL
+    EXEC(N'CREATE SCHEMA [bot19]');
 GO
-IF OBJECT_ID(N'bot17.bot17_signals', N'U') IS NULL
+IF OBJECT_ID(N'bot19.bot19_signals', N'U') IS NULL
 BEGIN
-    CREATE TABLE [bot17].[bot17_signals] (
+    CREATE TABLE [bot19].[bot19_signals] (
         [Id]                 bigint IDENTITY(1,1) NOT NULL,
         [Symbol]             nvarchar(50)    NOT NULL,
         [Isin]               nvarchar(12)    NULL,
@@ -42,13 +42,13 @@ BEGIN
         [PositionSize]       decimal(38, 18) NULL,
         [RiskRewardRatio]    decimal(38, 18) NULL,
         [ExpectedProfit]     decimal(38, 18) NULL,
-        [TradeId]            nvarchar(36)    NULL,   -- bot17.bot17_trades.Id del trade aperto dal segnale
-        [Bot]                nvarchar(50)    NOT NULL CONSTRAINT [DF_Signals_Bot] DEFAULT (N'Bot 17'), -- bot che ha scritto la riga
+        [TradeId]            nvarchar(36)    NULL,   -- bot19.bot19_trades.Id del trade aperto dal segnale
+        [Bot]                nvarchar(50)    NOT NULL CONSTRAINT [DF_Signals_Bot] DEFAULT (N'Bot 19'), -- bot che ha scritto la riga
         CONSTRAINT [PK_Signals] PRIMARY KEY ([Id])
     );
-    CREATE INDEX [IX_Signals_Symbol_SignalCandleTime] ON [bot17].[bot17_signals] ([Symbol], [SignalCandleTime]);
-    PRINT 'Tabella bot17.bot17_signals creata';
+    CREATE INDEX [IX_Signals_Symbol_SignalCandleTime] ON [bot19].[bot19_signals] ([Symbol], [SignalCandleTime]);
+    PRINT 'Tabella bot19.bot19_signals creata';
 END
 ELSE
-    PRINT 'Tabella bot17.bot17_signals gia esistente: nessuna modifica';
+    PRINT 'Tabella bot19.bot19_signals gia esistente: nessuna modifica';
 GO

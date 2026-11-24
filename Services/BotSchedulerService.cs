@@ -57,7 +57,7 @@ public class BotSchedulerService
         }
 
         _isRunning = true;
-        Console.WriteLine("\n🤖 Bot 17 - Azioni italiane avviato! (paper trading: nessun ordine reale)");
+        Console.WriteLine("\n🤖 Bot 19 - Azioni italiane avviato! (paper trading: nessun ordine reale)");
         Console.WriteLine($"📊 Monitoraggio ogni {CheckInterval.TotalMinutes:F0} minuti, candele {_timeframe}...\n");
 
         // Esegui il primo controllo immediatamente
@@ -101,7 +101,7 @@ public class BotSchedulerService
         _isRunning = false;
         _marketCheckTimer?.Dispose();
         _weeklyReportTimer?.Dispose();
-        Console.WriteLine("\n🛑 Bot 17 - Azioni italiane fermato.");
+        Console.WriteLine("\n🛑 Bot 19 - Azioni italiane fermato.");
     }
 
     private async Task CheckMarketAsync()
@@ -351,7 +351,7 @@ public class BotSchedulerService
         }
         finally
         {
-            // Salva il ciclo nella tabella bot17.bot17_cycles (anche se terminato con errore)
+            // Salva il ciclo nella tabella bot19.bot19_cycles (anche se terminato con errore)
             if (cycle != null)
             {
                 cycle.EndTime = DateTime.UtcNow;

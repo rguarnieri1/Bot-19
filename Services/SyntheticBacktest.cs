@@ -26,7 +26,7 @@ public class SyntheticBacktest
         decimal expectedWinRate = 0.55m,
         int tradesPerSymbol = 8)
     {
-        Console.WriteLine($"\n🔍 BACKTEST SINTETICO - Bot 17 AZIONI ITALIANE");
+        Console.WriteLine($"\n🔍 BACKTEST SINTETICO - Bot 19 AZIONI ITALIANE");
         Console.WriteLine($"⏱️  Periodo: Ultimi {daysOfData} giorni");
         Console.WriteLine($"🪙 Simboli: {numSymbols}");
         Console.WriteLine($"📊 Trade per simbolo: {tradesPerSymbol}");
@@ -143,7 +143,7 @@ public class SyntheticBacktest
     public void PrintBacktestReport(SyntheticBacktestResult result)
     {
         Console.WriteLine("\n" + new string('═', 90));
-        Console.WriteLine("📊 SYNTHETIC BACKTEST REPORT - Bot 17 AZIONI ITALIANE");
+        Console.WriteLine("📊 SYNTHETIC BACKTEST REPORT - Bot 19 AZIONI ITALIANE");
         Console.WriteLine(new string('═', 90));
 
         Console.WriteLine($"\n📅 PERIODO TEST:");
@@ -242,7 +242,7 @@ public class SyntheticBacktest
 
             using (var writer = new StreamWriter(filePath))
             {
-                writer.WriteLine("SYNTHETIC BACKTEST REPORT - Bot 17 AZIONI ITALIANE");
+                writer.WriteLine("SYNTHETIC BACKTEST REPORT - Bot 19 AZIONI ITALIANE");
                 writer.WriteLine($"Generated: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
                 writer.WriteLine("");
                 writer.WriteLine($"Period: {result.DaysOfData} days");

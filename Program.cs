@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 // In esecuzione normale il bot scrive solo a schermo: nessun file cycles_yyyy-MM-dd.log.
 if (Environment.GetCommandLineArgs().Skip(1).FirstOrDefault()?.StartsWith("--backtest", StringComparison.OrdinalIgnoreCase) == true)
     FileLogger.Install(Path.Combine(AppContext.BaseDirectory, "Logs"), "backtest");
-Console.WriteLine($"▶️  Avvio Bot 17 - {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC - eseguibile in {AppContext.BaseDirectory}");
+Console.WriteLine($"▶️  Avvio Bot 19 - {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC - eseguibile in {AppContext.BaseDirectory}");
 
 // Qualsiasi errore che chiude il processo viene scritto a schermo, così si sa perché il bot si è fermato
 AppDomain.CurrentDomain.UnhandledException += (_, e) =>
@@ -17,7 +17,7 @@ TaskScheduler.UnobservedTaskException += (_, e) =>
     e.SetObserved();
 };
 AppDomain.CurrentDomain.ProcessExit += (_, _) =>
-    Console.WriteLine($"⏹️  Bot 17 terminato - {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
+    Console.WriteLine($"⏹️  Bot 19 terminato - {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
 Console.CancelKeyPress += (_, _) =>
     Console.WriteLine("⏹️  Chiusura richiesta con Ctrl+C");
 

@@ -1,16 +1,16 @@
--- Tabella bot17.bot17_trades del Bot 17, con gli stessi campi della classe Trade (Models/Cryptocurrency.cs)
+-- Tabella bot19.bot19_trades del Bot 19, con gli stessi campi della classe Trade (Models/Cryptocurrency.cs)
 -- e la stessa mappatura di Data/BotDbContext.cs. Lo script non fa nulla se la tabella esiste già.
 IF DB_ID(N'bot') IS NULL
     CREATE DATABASE [bot];
 GO
 USE [bot];
 GO
-IF SCHEMA_ID(N'bot17') IS NULL
-    EXEC(N'CREATE SCHEMA [bot17]');
+IF SCHEMA_ID(N'bot19') IS NULL
+    EXEC(N'CREATE SCHEMA [bot19]');
 GO
-IF OBJECT_ID(N'bot17.bot17_trades', N'U') IS NULL
+IF OBJECT_ID(N'bot19.bot19_trades', N'U') IS NULL
 BEGIN
-    CREATE TABLE [bot17].[bot17_trades] (
+    CREATE TABLE [bot19].[bot19_trades] (
         [Id]               nvarchar(36)    NOT NULL,
         [Symbol]           nvarchar(50)    NULL,
         [Isin]             nvarchar(12)    NULL,
@@ -28,12 +28,12 @@ BEGIN
         [PositionSize]     decimal(38, 18) NOT NULL,
         [SignalCandleTime] datetime2       NULL,
         [ExitReason]       nvarchar(100)   NULL,
-        [Bot]                nvarchar(50)    NOT NULL CONSTRAINT [DF_Trades_Bot] DEFAULT (N'Bot 17'), -- bot che ha scritto la riga
+        [Bot]                nvarchar(50)    NOT NULL CONSTRAINT [DF_Trades_Bot] DEFAULT (N'Bot 19'), -- bot che ha scritto la riga
         CONSTRAINT [PK_Trades] PRIMARY KEY ([Id])
     );
-    CREATE INDEX [IX_Trades_Symbol_Status] ON [bot17].[bot17_trades] ([Symbol], [Status]);
-    PRINT 'Tabella bot17.bot17_trades creata';
+    CREATE INDEX [IX_Trades_Symbol_Status] ON [bot19].[bot19_trades] ([Symbol], [Status]);
+    PRINT 'Tabella bot19.bot19_trades creata';
 END
 ELSE
-    PRINT 'Tabella bot17.bot17_trades gia esistente: nessuna modifica';
+    PRINT 'Tabella bot19.bot19_trades gia esistente: nessuna modifica';
 GO

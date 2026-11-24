@@ -1,4 +1,4 @@
--- Tabella bot17.bot17_cycles del Bot 17: un record per ogni ciclo di controllo del mercato (CheckMarketAsync),
+-- Tabella bot19.bot19_cycles del Bot 19: un record per ogni ciclo di controllo del mercato (CheckMarketAsync),
 -- con gli stessi dati del report "Ciclo completato" scritto in Logs/cycles_yyyy-MM-dd.log.
 -- Non fa nulla se la tabella esiste gia.
 IF DB_ID(N'bot') IS NULL
@@ -6,12 +6,12 @@ IF DB_ID(N'bot') IS NULL
 GO
 USE [bot];
 GO
-IF SCHEMA_ID(N'bot17') IS NULL
-    EXEC(N'CREATE SCHEMA [bot17]');
+IF SCHEMA_ID(N'bot19') IS NULL
+    EXEC(N'CREATE SCHEMA [bot19]');
 GO
-IF OBJECT_ID(N'bot17.bot17_cycles', N'U') IS NULL
+IF OBJECT_ID(N'bot19.bot19_cycles', N'U') IS NULL
 BEGIN
-    CREATE TABLE [bot17].[bot17_cycles] (
+    CREATE TABLE [bot19].[bot19_cycles] (
         [Id]               bigint IDENTITY(1,1) NOT NULL,
         [CycleNumber]      int             NOT NULL, -- "Ciclo #N" (riparte da 1 a ogni avvio del bot)
         [StartTime]        datetime2       NOT NULL, -- inizio del ciclo (UTC)
@@ -29,12 +29,12 @@ BEGIN
         [RealizedPnl]      decimal(38, 18) NOT NULL, -- P&L realizzato cumulativo (EUR)
         [RejectionCounts]  nvarchar(max)   NULL,     -- motivi di scarto del ciclo in JSON, es. {"Volume insufficiente": 120}
         [Error]            nvarchar(max)   NULL,     -- messaggio se il ciclo e terminato con errore
-        [Bot]                nvarchar(50)    NOT NULL CONSTRAINT [DF_Cycles_Bot] DEFAULT (N'Bot 17'), -- bot che ha scritto la riga
+        [Bot]                nvarchar(50)    NOT NULL CONSTRAINT [DF_Cycles_Bot] DEFAULT (N'Bot 19'), -- bot che ha scritto la riga
         CONSTRAINT [PK_Cycles] PRIMARY KEY ([Id])
     );
-    CREATE INDEX [IX_Cycles_StartTime] ON [bot17].[bot17_cycles] ([StartTime]);
-    PRINT 'Tabella bot17.bot17_cycles creata';
+    CREATE INDEX [IX_Cycles_StartTime] ON [bot19].[bot19_cycles] ([StartTime]);
+    PRINT 'Tabella bot19.bot19_cycles creata';
 END
 ELSE
-    PRINT 'Tabella bot17.bot17_cycles gia esistente: nessuna modifica';
+    PRINT 'Tabella bot19.bot19_cycles gia esistente: nessuna modifica';
 GO
